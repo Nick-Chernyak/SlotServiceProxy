@@ -7,11 +7,9 @@ namespace SlotServiceProxy.Infrastructure.DependencyInjection;
 
 public static class MediatrConfiguration
 {
-    public static IServiceCollection RegisterMediatR(this IServiceCollection serviceCollection)
+    public static void RegisterMediatR(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddMediatR(typeof(FetchFreeSlotsQuery));
         serviceCollection.AddMediatR(typeof(ReserveSlotCommand));
-
-        return serviceCollection;
     }
 }
