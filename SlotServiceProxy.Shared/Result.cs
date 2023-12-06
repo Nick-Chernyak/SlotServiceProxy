@@ -1,5 +1,10 @@
 ﻿namespace SlotServiceProxy.Shared;
 
+/// <summary>
+/// Simple model which represents result of operation without any additional data.
+/// </summary>
+/// <typeparam name="TError">Type which expected when unsuccessful flow occured. Usually must contain detail info
+/// about unsuccessful flow.</typeparam>
 public class VerificationResult<TError>
 {
     protected VerificationResult()
@@ -13,7 +18,7 @@ public class VerificationResult<TError>
 
     public static VerificationResult<TError> Failure(TError error) => new(error);
 
-    protected TError InternalError { get; set; }
+    protected TError InternalError { get; set; } = default!;
 
     public TError Problem => InternalError;
 
@@ -24,6 +29,12 @@ public class VerificationResult<TError>
     private static bool IsError(TError data) => EqualityComparer<TError>.Default.Equals(data, default);
 }
 
+/// <summary>
+/// Represent result of operation with additional data, in case of successful flow.
+/// </summary>
+/// <typeparam name="TData">Result of operation which can be used by initiator of flow (and usually expected).</typeparam>
+/// <typeparam name="TError">Type which expected when unsuccessful flow occured. Usually must contain detail info
+/// about unsuccessful flow.</typeparam>
 public class Result<TData, TError> : VerificationResult<TError>
 {
     public Result(TData data, TError error)
@@ -39,30 +50,28 @@ public class Result<TData, TError> : VerificationResult<TError>
     public TData Data { get; }
 
     /// <summary>
-    /// project values into new types within Result context
+    /// Project values into new types within Result context.
     /// </summary>
-    /// <param name="data">data projection</param>
-    /// <param name="error">error projection</param>
-    /// <typeparam name="TR">new type of data</typeparam>
-    /// <typeparam name="TL">new type of error</typeparam>
-    /// <returns>updated Result</returns>
+    /// <param name="data">Data projection.</param>
+    /// <param name="error">Error projection.</param>
+    /// <typeparam name="TR">New type of data.</typeparam>
+    /// <typeparam name="TL">New type of error.</typeparam>
     public Result<TR, TL> BiMap<TR, TL>(Func<TData, TR> data, Func<TError, TL> error) => IsSuccess
         ? Result<TR, TL>.Ok(data(Data))
         : Result<TR, TL>.Failure(error(Problem));
 
     /// <summary>
-    /// project values into new types within Result context
+    /// Project values into new types within Result context.
     /// </summary>
-    /// <param name="data">data projection</param>
-    /// <typeparam name="TR">new type of data</typeparam>
-    /// <returns>updated Result</returns>
+    /// <param name="data">Data projection.</param>
+    /// <typeparam name="TR">New type of data.</typeparam>
     public Result<TR, TError> Map<TR>(Func<TData, TR> map) => BiMap(map, e => e);
 
     /// <summary>
-    /// perform action with side-effects in Result context
+    /// Perform action with side-effects in Result context, without returning any value.
     /// </summary>
-    /// <param name="data">action to perform for Result in Data state</param>
-    /// <param name="error">action to perform for Result in Error state</param>
+    /// <param name="data">Action to perform for Result in Data state.</param>
+    /// <param name="error">Action to perform for Result in Error state.</param>
     public void Do(Action<TData> data, Action<TError> error)
     {
         if (IsSuccess) data(Data);
@@ -70,34 +79,32 @@ public class Result<TData, TError> : VerificationResult<TError>
     }
 
     /// <summary>
-    /// simplify instantiation of context in Data state
+    /// Simplify instantiation of context in Data state.
     /// </summary>
-    /// <param name="data">value to wrap</param>
-    /// <returns></returns>
+    /// <param name="data">Value to wrap.</param>
     public static implicit operator Result<TData, TError>(TData data) => Ok(data);
 
     /// <summary>
-    /// simplify instantiation of context in Error state
+    /// Simplify instantiation of context in Error state.
     /// </summary>
-    /// <param name="error">error to wrap</param>
-    /// <returns></returns>
+    /// <param name="error">Error to wrap</param>
     public static implicit operator Result<TData, TError>(TError error) => Failure(error);
 
     /// <summary>
-    /// project Data state to new type within Result context
+    /// Project Data state to new type within Result context.
     /// </summary>
-    /// <param name="binder">projection returning context</param>
-    /// <typeparam name="TR">new Data type</typeparam>
-    /// <returns>Result context with updated Data type</returns>
+    /// <param name="binder">Projection returning context.</param>
+    /// <typeparam name="TR">New Data type.</typeparam>
+    /// <returns>Result context with updated Data type.</returns>
     public Result<TR, TError> Bind<TR>(Func<TData, Result<TR, TError>> binder) =>
         IsSuccess ? binder(Data) : Result<TR, TError>.Failure(Problem);
 
     /// <summary>
-    /// project Data state to new type within Result context
+    /// Project Data state to new type within Result context
     /// </summary>
-    /// <param name="binder">projection returning context</param>
-    /// <typeparam name="TR">new Data type</typeparam>
-    /// <typeparam name="TState">additional data which needed to perform binding</typeparam>
+    /// <param name="binder">Projection returning context.</param>
+    /// <typeparam name="TR">New Data type.</typeparam>
+    /// <typeparam name="TState">Additional data which needed to perform binding (very primitive currying)</typeparam>
     /// <returns>Result context with updated Data type</returns>
     public Result<TR, TError> Bind<TR, TState>(Func<TData, TState, Result<TR, TError>> binder, TState state) =>
         IsSuccess ? binder(Data, state) : Result<TR, TError>.Failure(Problem);
@@ -109,6 +116,9 @@ public class Result<TData, TError> : VerificationResult<TError>
         await (IsSuccess ? binder(Data, state) : Task.FromResult(Result<TR, TError>.Failure(Problem)));
 }
 
+/// <summary>
+/// Useful extensions for Result type.
+/// </summary>
 public static class Result
 {
     public static Result<TData, TError> OnSuccess<TData, TError>(this Result<TData, TError> source, Action<TData> action)
