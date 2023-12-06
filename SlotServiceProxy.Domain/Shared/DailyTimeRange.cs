@@ -1,4 +1,4 @@
-﻿namespace SlotServiceProxy.Domain.Shared.ValueObjects;
+﻿namespace SlotServiceProxy.Domain.Shared;
 
 /// <summary>
 /// Simple struct to represent a time range inside one day.

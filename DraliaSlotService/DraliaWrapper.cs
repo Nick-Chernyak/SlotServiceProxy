@@ -1,9 +1,7 @@
 ﻿using DraliaSlotService.SDK;
 using Flurl.Http;
 using Flurl.Http.Configuration;
-using SlotServiceProxy.Domain.Shared;
-using SlotServiceProxy.Domain.Shared.ValueObjects;
-using SlotServiceProxy.Infrastructure;
+using SlotServiceProxy.Domain;
 using SlotServiceProxy.Shared;
 
 namespace DraliaSlotService;
@@ -23,7 +21,7 @@ public class DraliaWrapper : IDisposable
             .Do(client => client.BaseUrl = BaseUrl)
             .Configure(ConfigureClient);
 
-    public Task<Result<FacilityWeekResponse, ErrorData>> GetAvailableSlotsPerWeek(DateTime searchDate)
+    public Task<Result<FacilityWeekResponse, Problem>> GetAvailableSlotsPerWeek(DateTime searchDate)
         => _client.Request(AvailabilitySegment, GetWeeklySegment)
             .AppendPathSegment($"{DraliaHelper.GetMondayDateOfCurrentWeek(searchDate):yyyyMMdd}")
             .GetAsync()
@@ -35,7 +33,7 @@ public class DraliaWrapper : IDisposable
             .PostJsonAsync(reserveSlotRequest)
             .To(ConvertResponseTo);
 
-    private static async Task<Result<T, ErrorData>> ConvertResponseTo<T>(Task<IFlurlResponse> response)
+    private static async Task<Result<T, Problem>> ConvertResponseTo<T>(Task<IFlurlResponse> response)
     {
         try
         {
@@ -45,7 +43,7 @@ public class DraliaWrapper : IDisposable
         }
         catch (FlurlHttpTimeoutException)
         {
-            return new ErrorData(Message: "Timeout".To(e => new NotEmptyString(e)));
+            return new Problem("Timetable owner not respond. Try again later.", ProblemType.ExternalServiceError);
         }
         catch (FlurlParsingException)
         {
@@ -53,9 +51,9 @@ public class DraliaWrapper : IDisposable
         }
         catch (FlurlHttpException ex)
         {
-            var Problem = await ex.GetResponseJsonAsync<string>();
-            return Problem.To(e => new NotEmptyString(e)
-                .To(e => new ErrorData(e)));
+            //Can be use for logging at least.
+            var errorMessage = await ex.GetResponseJsonAsync<string>();
+            return new Problem($"External service error: {errorMessage}", ProblemType.ExternalServiceError);
         }
     }
     

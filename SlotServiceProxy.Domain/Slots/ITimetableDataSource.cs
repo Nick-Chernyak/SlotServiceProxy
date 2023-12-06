@@ -1,17 +1,15 @@
 ﻿using SlotServiceProxy.Domain.Shared;
 using SlotServiceProxy.Domain.Shared.ValueObjects;
-using SlotServiceProxy.Domain.Slots;
 using SlotServiceProxy.Shared;
 
-namespace SlotServiceProxy.Domain;
+namespace SlotServiceProxy.Domain.Slots;
 
-//TODO: already bad name, should be renamed.
 /// <summary>
-/// Define the contract for the slots data source (actually repository pattern).
+/// Define the contract for the timetable data source (actually repository pattern).
 /// </summary>
-public interface ISlotsDataSource
+public interface ITimetableDataSource
 {
-    Task<Result<Doctor, ErrorData>> GetDoctorWithWeekCalendarAsync(DateTime from);
+    Task<Result<OwnedTimetable, Problem>> GetDoctorWithWeekCalendarAsync(DateTime from);
 
     Task<Result<DayInTimetable, Problem>> GetDayInTimetableAsync(DateTime searchDate);
     

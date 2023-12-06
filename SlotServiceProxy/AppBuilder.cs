@@ -1,6 +1,7 @@
 ﻿using DryIoc.Microsoft.DependencyInjection;
 using MediatR;
 using Microsoft.OpenApi.Models;
+using SlotServiceProxy.Domain;
 using SlotServiceProxy.Infrastructure;
 using SlotServiceProxy.Infrastructure.DependencyInjection;
 using SlotServiceProxy.Middlewares;

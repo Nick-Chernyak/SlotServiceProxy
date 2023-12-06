@@ -2,6 +2,7 @@
 using SlotServiceProxy.Application.Slots.SDK;
 using SlotServiceProxy.Domain;
 using SlotServiceProxy.Domain.Rules.ReserveSlot;
+using SlotServiceProxy.Domain.Shared;
 using SlotServiceProxy.Domain.Shared.ValueObjects;
 using SlotServiceProxy.Domain.Slots;
 using SlotServiceProxy.Shared;
@@ -10,17 +11,17 @@ namespace SlotServiceProxy.Application.Slots.ReserveSlot;
 
 public class ReserveSlotCommandHandler : BaseRulesCheckerHandler, IRequestHandler<ReserveSlotCommand, Result<ReservedSlotDto, Problem>>
 {
-    private readonly ISlotsDataSource _slotsDataSource;
+    private readonly ITimetableDataSource _timetableDataSource;
 
-    public ReserveSlotCommandHandler(ISlotsDataSource slotsDataSource)
-        => _slotsDataSource = slotsDataSource;
+    public ReserveSlotCommandHandler(ITimetableDataSource timetableDataSource)
+        => _timetableDataSource = timetableDataSource;
 
     public async Task<Result<ReservedSlotDto, Problem>> Handle(ReserveSlotCommand reserveSlotCommand,
         CancellationToken cancellationToken)
     {
         var slotForReservation = CheckRulesAndGetSlotOrThrow(reserveSlotCommand);
         
-        var dayAsResult = await _slotsDataSource.GetDayInTimetableAsync(slotForReservation.Start.Date);
+        var dayAsResult = await _timetableDataSource.GetDayInTimetableAsync(slotForReservation.Start.Date);
 
         if (dayAsResult.IsFailure)
             return dayAsResult.Problem;
@@ -30,7 +31,7 @@ public class ReserveSlotCommandHandler : BaseRulesCheckerHandler, IRequestHandle
         if (slotVerificationResult.IsFailure)
             return slotVerificationResult.Problem;
         
-        var reservationResult = await _slotsDataSource.ReserveSlotAsync(slotForReservation, 
+        var reservationResult = await _timetableDataSource.ReserveSlotAsync(slotForReservation, 
             reserveSlotCommand.Patient.To(ToPatient), 
             reserveSlotCommand.FacilityId, 
             reserveSlotCommand.Comments);

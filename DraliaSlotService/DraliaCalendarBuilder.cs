@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using DraliaSlotService.SDK;
+using SlotServiceProxy.Domain.Shared;
 using SlotServiceProxy.Domain.Shared.ValueObjects;
 using SlotServiceProxy.Domain.Slots;
 using SlotServiceProxy.Shared;
@@ -27,11 +28,11 @@ public class DraliaCalendarBuilder
         _slotDurationInMinutes = TimeSpan.FromMinutes(facilityWeek.SlotDurationMinutes);
     }
     
-    public DoctorCalendar BuildWholeCalendar() 
+    public Timetable BuildWholeCalendar() 
         => _facilityWeek.Days.Where(SameAsSearchDayOrLaterInWeek)
             .Select(BuildDayInTimeTable)
             .ToImmutableSortedSet()
-            .To(DoctorCalendar.Create);
+            .To(Timetable.Create);
 
     public Result<DayInTimetable, Problem> BuildSingleDay()
         => _facilityWeek.Days.SingleOrDefault(SameAsSearchDayInWeek) switch

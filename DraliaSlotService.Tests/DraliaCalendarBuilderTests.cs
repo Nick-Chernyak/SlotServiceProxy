@@ -1,5 +1,6 @@
 ﻿using DraliaSlotService.SDK;
 using FluentAssertions;
+using SlotServiceProxy.Domain.Shared;
 using SlotServiceProxy.Domain.Shared.ValueObjects;
 using SlotServiceProxy.Shared;
 using Xunit;

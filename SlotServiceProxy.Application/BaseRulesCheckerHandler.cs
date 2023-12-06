@@ -1,5 +1,5 @@
-﻿using SlotServiceProxy.Domain.Rules;
-using SlotServiceProxy.Infrastructure.Application;
+﻿using SlotServiceProxy.Domain;
+using SlotServiceProxy.Domain.Rules;
 
 namespace SlotServiceProxy.Application;
 

@@ -1,11 +1,18 @@
-﻿using SlotServiceProxy.Domain.Shared.ValueObjects;
+﻿using SlotServiceProxy.Domain.Shared;
+using SlotServiceProxy.Domain.Shared.ValueObjects;
 
 namespace SlotServiceProxy.Domain.Slots;
 
+/// <summary>
+/// Represent a single day in a doctor's timetable with related available slots.
+/// </summary>
 public record DayInTimetable : IComparable<DayInTimetable>
 {
     private readonly HashSet<DailyTimeRange> _slots;
     
+    /// <summary>
+    /// Date in the yyyy-MM-dd format (without time).
+    /// </summary>
     public DateTime Date { get; }
     
     public TimeSpan Start { get; }
@@ -22,7 +29,7 @@ public record DayInTimetable : IComparable<DayInTimetable>
         if (end - start > TimeSpan.FromDays(1))
             throw new ArgumentException("Day duration must be less than 24 hours");
         
-        Date = date;
+        Date = date.Date;
         Start = start;
         End = end;
         _slots = new HashSet<DailyTimeRange>();
@@ -42,10 +49,8 @@ public record DayInTimetable : IComparable<DayInTimetable>
         _slots.RemoveWhere(s => s.End < dateTime);
     }
 
-    public int CompareTo(DayInTimetable? obj)
-    {
-        return Date.CompareTo(obj?.Date);
-    }
+    public int CompareTo(DayInTimetable? obj) 
+        => Date.CompareTo(obj?.Date);
     
     private void AddSlot(DailyTimeRange dailyTimeRange)
     {

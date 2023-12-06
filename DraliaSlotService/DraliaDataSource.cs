@@ -1,6 +1,5 @@
 ﻿using DraliaSlotService.SDK;
 using Flurl.Http.Configuration;
-using SlotServiceProxy.Domain;
 using SlotServiceProxy.Domain.Shared;
 using SlotServiceProxy.Domain.Shared.ValueObjects;
 using SlotServiceProxy.Domain.Slots;
@@ -8,20 +7,20 @@ using SlotServiceProxy.Shared;
 
 namespace DraliaSlotService;
 
-public class DraliaSlotsDataSource : ISlotsDataSource
+public class DraliaTimetableDataSource : ITimetableDataSource
 {
     private readonly DraliaWrapper _draliaWrapper;
 
-    public DraliaSlotsDataSource(IFlurlClientFactory flurlClientFactory)
+    public DraliaTimetableDataSource(IFlurlClientFactory flurlClientFactory)
         => _draliaWrapper = new DraliaWrapper(flurlClientFactory);
 
-    public async Task<Result<Doctor, ErrorData>> GetDoctorWithWeekCalendarAsync(DateTime from)
+    public async Task<Result<OwnedTimetable, Problem>> GetDoctorWithWeekCalendarAsync(DateTime from)
     {
         var slotsAsResult = await _draliaWrapper.GetAvailableSlotsPerWeek(from);
         
         return slotsAsResult.IsSuccess
             ? BuildDoctorWithCalendar(slotsAsResult.Data, from)
-            : Result<Doctor, ErrorData>.Failure(slotsAsResult.Problem);
+            : Result<OwnedTimetable, Problem>.Failure(slotsAsResult.Problem);
     }
 
     public async Task<VerificationResult<Problem>> ReserveSlotAsync(
@@ -43,12 +42,12 @@ public class DraliaSlotsDataSource : ISlotsDataSource
             : Result<DayInTimetable, Problem>.Failure(new Problem(slotsAsResult.Problem.Message, ProblemType.ExternalServiceError));
     }
     
-    private static DoctorCalendar BuildDoctorCalendar(FacilityWeekResponse facilityWeek, DateTime mondayDate)
+    private static Timetable BuildDoctorCalendar(FacilityWeekResponse facilityWeek, DateTime mondayDate)
         => new DraliaCalendarBuilder(facilityWeek, mondayDate).To(b => b.BuildWholeCalendar());
     
     private static Result<DayInTimetable, Problem> BuildSingleDayInTimetable(FacilityWeekResponse facilityWeek, DateTime mondayDate) 
         => new DraliaCalendarBuilder(facilityWeek, mondayDate).To(b => b.BuildSingleDay());
 
-    private static Doctor BuildDoctorWithCalendar(FacilityWeekResponse facilityWeek, DateTime from) =>
+    private static OwnedTimetable BuildDoctorWithCalendar(FacilityWeekResponse facilityWeek, DateTime from) =>
         new(new NotEmptyString(facilityWeek.Facility.FacilityId), BuildDoctorCalendar(facilityWeek, from));
 }

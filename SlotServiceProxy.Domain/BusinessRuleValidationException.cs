@@ -1,8 +1,11 @@
 ﻿using SlotServiceProxy.Domain.Rules;
 using SlotServiceProxy.Shared;
 
-namespace SlotServiceProxy.Infrastructure.Application;
+namespace SlotServiceProxy.Domain;
 
+/// <summary>
+/// 
+/// </summary>
 public class BusinessRuleValidationException : Exception
 {
     public IBusinessRule BrokenRule { get; }

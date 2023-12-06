@@ -1,4 +1,4 @@
-﻿using SlotServiceProxy.Domain.Shared.ValueObjects;
+﻿using SlotServiceProxy.Domain.Shared;
 
 namespace SlotServiceProxy.Domain.Rules.ReserveSlot;
 

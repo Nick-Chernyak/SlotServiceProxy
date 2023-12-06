@@ -1,5 +1,10 @@
-﻿namespace SlotServiceProxy.Infrastructure;
+﻿namespace SlotServiceProxy.Domain;
 
+/// <summary>
+/// Super simple configurator for getting and storing slot server credentials.
+/// Mostly cover one function - remove creds from the repo code.
+/// For sure, not real app should use such a solution -> simplified to concentrate on the main topic of the project.
+/// </summary>
 public static class DummyConfigurator
 {
     private static IDictionary<string, string> _draliaCredentials = new Dictionary<string, string>();

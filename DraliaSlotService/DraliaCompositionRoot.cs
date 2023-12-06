@@ -8,7 +8,7 @@ public static class DraliaCompositionRoot
 {
     public static IRegistrator DraliaSource(this IRegistrator registrator)
     {
-        registrator.Register<ISlotsDataSource, DraliaSlotsDataSource>();
+        registrator.Register<ITimetableDataSource, DraliaTimetableDataSource>();
         return registrator;
     }
 }

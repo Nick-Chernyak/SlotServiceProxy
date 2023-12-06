@@ -2,6 +2,7 @@
 using SlotServiceProxy.Application.Slots.SDK;
 using SlotServiceProxy.Domain;
 using SlotServiceProxy.Domain.Rules.FetchFreeSlots;
+using SlotServiceProxy.Domain.Shared;
 using SlotServiceProxy.Domain.Shared.ValueObjects;
 using SlotServiceProxy.Domain.Slots;
 using SlotServiceProxy.Shared;
@@ -10,29 +11,29 @@ namespace SlotServiceProxy.Application.Slots.FetchFreeSlots;
 
 public class FetchFreeSlotsQueryHandler : BaseRulesCheckerHandler, IRequestHandler<FetchFreeSlotsQuery, Result<CalendarDto, Problem>>
 {
-    private readonly ISlotsDataSource _slotsDataSource;
+    private readonly ITimetableDataSource _timetableDataSource;
 
-    public FetchFreeSlotsQueryHandler(ISlotsDataSource slotsDataSource)
-        => _slotsDataSource = slotsDataSource;
+    public FetchFreeSlotsQueryHandler(ITimetableDataSource timetableDataSource)
+        => _timetableDataSource = timetableDataSource;
 
     public async Task<Result<CalendarDto, Problem>> Handle(FetchFreeSlotsQuery request, CancellationToken cancellationToken)
     {
         CheckRule(new SearchDateMustBeTodayOrInFuture(request.SearchDate));
 
-        var calendarAsResult = await _slotsDataSource.GetDoctorWithWeekCalendarAsync(request.SearchDate);
+        var calendarAsResult = await _timetableDataSource.GetDoctorWithWeekCalendarAsync(request.SearchDate);
         return calendarAsResult.BiMap(
                 doctorCalendar =>
                 {
-                    doctorCalendar.Calendar.Do(CutOffNotAvailableTodaySlotsIfNeeded);
+                    doctorCalendar.Timetable.Do(CutOffNotAvailableTodaySlotsIfNeeded);
                     return ToDoctorWithCalendarDto(doctorCalendar, request.SearchDate);
                 },
                 error => new Problem(error.Message));
     }
 
-    private static void CutOffNotAvailableTodaySlotsIfNeeded(DoctorCalendar doctorCalendar)
+    private static void CutOffNotAvailableTodaySlotsIfNeeded(Timetable timetable)
     {
         var now = DateTime.Now;
-        var today = doctorCalendar.Days.SingleOrDefault(d => d.Date == now);
+        var today = timetable.Days.SingleOrDefault(d => d.Date == now);
         today?.CutOffSlotsBefore(now);
     }
 
@@ -45,14 +46,14 @@ public class FetchFreeSlotsQueryHandler : BaseRulesCheckerHandler, IRequestHandl
     
     #region Mapping
 
-    private static CalendarDto ToDoctorWithCalendarDto(Doctor doctor, DateTime searchDate)
+    private static CalendarDto ToDoctorWithCalendarDto(OwnedTimetable ownedTimetable, DateTime searchDate)
         => new()
         {
-            Id = doctor.Id,
+            Id = ownedTimetable.OwnerId,
             CurrentWeek = new CurrentWeekDto
             {
                 From = searchDate,
-                Days = doctor.Calendar.Days.Select(ToDayDto).ToArray()
+                Days = ownedTimetable.Timetable.Days.Select(ToDayDto).ToArray()
             }
         };
 

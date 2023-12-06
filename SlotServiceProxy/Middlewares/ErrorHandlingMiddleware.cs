@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using SlotServiceProxy.Infrastructure.Application;
+using SlotServiceProxy.Domain;
 using SlotServiceProxy.Shared;
 
 namespace SlotServiceProxy.Middlewares;
