@@ -12,13 +12,13 @@ public record ReserveSlotRequest(
     string Comments,
     string FacilityId)
 {
-    public static ReserveSlotRequest FromSlot(DailyTimeRange dailyTimeRange, Patient patient, NotEmptyString facilityId,
+    public static ReserveSlotRequest FromSlot(DailyTimeRange dailyTimeRange, PatientInfo patientInfo, NotEmptyString facilityId,
         string? comments)
-        => new(dailyTimeRange.Start, dailyTimeRange.End, PatientDto.FromPatient(patient), comments ?? string.Empty, facilityId);
+        => new(dailyTimeRange.Start, dailyTimeRange.End, PatientDto.FromPatient(patientInfo), comments ?? string.Empty, facilityId);
 }
 
 public record PatientDto(string Name, string SecondName, string Email, string Phone)
 {
-    public static PatientDto FromPatient(Patient patientDto)
-        => new(patientDto.Name, patientDto.SecondName, patientDto.Email, patientDto.Phone);
+    public static PatientDto FromPatient(PatientInfo patientInfoDto)
+        => new(patientInfoDto.Name, patientInfoDto.SecondName, patientInfoDto.Email, patientInfoDto.Phone);
 }

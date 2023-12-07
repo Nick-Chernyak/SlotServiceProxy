@@ -7,7 +7,8 @@ public record SearchDateMustBeTodayOrInFuture : IBusinessRule
     public SearchDateMustBeTodayOrInFuture(DateTime dateTime) 
         => _dateTime = dateTime;
     
-    public bool IsBroken() => _dateTime.Date < DateTime.UtcNow.Date;
+    public bool IsBroken()
+        => _dateTime.Date < DateTime.UtcNow.Date;
     
     public string Message => "Search date must be today or in future.";
 }

@@ -7,7 +7,7 @@ public record NotEmptyString : IValueObject<string>
     public NotEmptyString(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new InvalidDataException("The value was supposed to be a not empty string");
+            throw new ValueObjectException<NotEmptyString>("The value was supposed to be a not empty string");
 
         Value = value;
     }

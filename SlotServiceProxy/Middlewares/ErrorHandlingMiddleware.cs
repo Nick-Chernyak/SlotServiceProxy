@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SlotServiceProxy.Domain;
+using SlotServiceProxy.Domain.Rules;
+using SlotServiceProxy.Domain.Shared.ValueObjects;
 using SlotServiceProxy.Shared;
 
 namespace SlotServiceProxy.Middlewares;
@@ -31,6 +33,7 @@ public class ErrorHandlingMiddleware
 
     private async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
     {
+        //Logging is skipped for simplicity, but should be added here in real project, for sure.
         var problemDetails = exception switch
         {
             BusinessRuleValidationException businessException => businessException.Problem

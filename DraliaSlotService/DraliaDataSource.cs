@@ -25,10 +25,10 @@ public class DraliaTimetableDataSource : ITimetableDataSource
 
     public async Task<VerificationResult<Problem>> ReserveSlotAsync(
         DailyTimeRange dailyTimeRange,
-        Patient patient,
+        PatientInfo patientInfo,
         NotEmptyString facilityId, string? comments)
     {
-        var request = ReserveSlotRequest.FromSlot(dailyTimeRange, patient, facilityId, comments);
+        var request = ReserveSlotRequest.FromSlot(dailyTimeRange, patientInfo, facilityId, comments);
         var result = await _draliaWrapper.TryToReserveSlot(request);
         return result;
     }

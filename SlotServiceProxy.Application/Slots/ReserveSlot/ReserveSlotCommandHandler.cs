@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using SlotServiceProxy.Application.Slots.SDK;
-using SlotServiceProxy.Domain;
 using SlotServiceProxy.Domain.Rules.ReserveSlot;
 using SlotServiceProxy.Domain.Shared;
 using SlotServiceProxy.Domain.Shared.ValueObjects;
@@ -111,12 +110,16 @@ public class ReserveSlotCommandHandler : BaseRulesCheckerHandler, IRequestHandle
     
     #region Mapping
 
-    private static Patient ToPatient(PatientDto patientDto)
-    {
-        return patientDto.To(patient => new Patient(new NotEmptyString(patientDto.FirstName), new NotEmptyString(patientDto.LastName),
-            patientDto.Email, patientDto.PhoneNumber));
-    }
-
+    //Since we expect that PatientDto structurally validated already, 
+    //We can assume that no exceptions expected here.
+    //Instead of passing PatientDto to the Slot Source (which is part of app abstraction) we pass strong-typed values inside
+    //Patient object, and can be sure by their types that they are valid -> domain guarantees that.
+    private static PatientInfo ToPatient(PatientDto patientDto)
+        => new(patientDto.FirstName.To(x => new NotEmptyString(x)),
+            patientDto.LastName.To(x => new NotEmptyString(x)),
+            patientDto.Email.To(x => new Email(x)),
+            patientDto.PhoneNumber.To(x => new PhoneNumber(x)));
+    
     private static ReservedSlotDto ToReserveSlotResponseDto(SlotDto reservedSlot, NotEmptyString facilityId)
         => new(facilityId, reservedSlot);
 

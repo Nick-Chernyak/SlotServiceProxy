@@ -1,10 +1,9 @@
-﻿using SlotServiceProxy.Domain.Rules;
-using SlotServiceProxy.Shared;
+﻿using SlotServiceProxy.Shared;
 
-namespace SlotServiceProxy.Domain;
+namespace SlotServiceProxy.Domain.Rules;
 
 /// <summary>
-/// 
+/// Represent exception which should be thrown when business rule is broken and handled accordingly of this nature.
 /// </summary>
 public class BusinessRuleValidationException : Exception
 {

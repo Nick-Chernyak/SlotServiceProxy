@@ -14,7 +14,7 @@ public interface ITimetableDataSource
     Task<Result<DayInTimetable, Problem>> GetDayInTimetableAsync(DateTime searchDate);
     
     Task<VerificationResult<Problem>> ReserveSlotAsync(DailyTimeRange dailyTimeRange,
-        Patient patient,
+        PatientInfo patientInfo,
         NotEmptyString facilityId, 
         string? comments);
 }

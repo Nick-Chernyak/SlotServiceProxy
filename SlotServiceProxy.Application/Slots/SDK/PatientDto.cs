@@ -25,22 +25,22 @@ public record PatientDto
     [Required]
     [StringLength(30)]
     public required string LastName { get; init; }
-
+    
     /// <summary>
     /// Patient email address.
     /// Required.
-    /// Format:
+    /// Regex format: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
     /// </summary>
     [Required]
-    //TODO: add validation of email address.
+    [RegularExpression(Domain.Shared.ValueObjects.Email.EmailPattern)]
     public required string Email { get; init; }
 
     /// <summary>
     /// Patient phone number.
     /// Required.
-    /// Regex format: "^\+(?:[0-9]●?){6,14}[0-9]$".
+    /// Regex format: ^\+[1-9]\d{1,14}$ (E.164 standard).
     /// </summary>
     [Required]
-    [RegularExpression("^(\\(\\d{3}\\)|\\d{3})-?\\d{3}-?\\d{4}$")]
+    [RegularExpression(Domain.Shared.ValueObjects.PhoneNumber.PhoneRegex)]
     public required string PhoneNumber { get; init; }
 }

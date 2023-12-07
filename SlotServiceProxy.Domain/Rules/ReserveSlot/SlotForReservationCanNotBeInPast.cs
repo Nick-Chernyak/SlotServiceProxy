@@ -6,7 +6,8 @@ public class SlotForReservationCanNotBeInPast : IBusinessRule
 {
     private readonly DailyTimeRange _dailyTimeRange;
     
-    public SlotForReservationCanNotBeInPast(DailyTimeRange dailyTimeRange) => _dailyTimeRange = dailyTimeRange;
+    public SlotForReservationCanNotBeInPast(DailyTimeRange dailyTimeRange)
+        => _dailyTimeRange = dailyTimeRange;
     
     public bool IsBroken() 
         => _dailyTimeRange.Start.Date < DateTime.Now.Date;

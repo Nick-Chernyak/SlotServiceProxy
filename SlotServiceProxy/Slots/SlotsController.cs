@@ -36,6 +36,10 @@ public class SlotsController : SlotsProxyBaseController
     /// Reserves a slot for a given doctor (id) and patient if it is correct and still available.
     /// </summary>
     [HttpPost("Reserve")]
+    [ProducesResponseType(typeof(ProblemDetails), 400)]
+    [ProducesResponseType(typeof(ProblemDetails), 422)]
+    [ProducesResponseType(typeof(ProblemDetails), 500)]
+    [ProducesResponseType(typeof(ProblemDetails), 502)]
     public async Task<ActionResult<ReservedSlotDto>> ReserveSlot([FromBody] ReserveSlotDto request)
         => (await new ReserveSlotCommand(request)
                 .To(command => _mediator.Send(command)))
