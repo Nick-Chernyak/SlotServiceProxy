@@ -23,6 +23,8 @@ public record FacilityWeekResponse(
         .Where(day => day.Day is not null).ToArray();
 }
 
+//Placed all this records in one file for simplicity -> they are not used independently.
+
 public record Facility(string FacilityId, string Name, string Address);
 
 public record FacilityDay(WorkPeriod WorkPeriod, IReadOnlyCollection<DailyTimeRange>? BusySlots);

@@ -6,6 +6,11 @@ using SlotServiceProxy.Shared;
 
 namespace DraliaSlotService;
 
+/// <summary>
+/// Builds <see cref="Timetable"/> from <see cref="FacilityWeekResponse"/>.
+/// One instance per one <see cref="FacilityWeekResponse"/> and <see cref="DateTime"/> pair.
+/// Designed like that to have a possibility store state (more clean building algorithm method chain inside).
+/// </summary>
 public class DraliaCalendarBuilder
 {
     private readonly DateTime _searchDate;
@@ -13,7 +18,7 @@ public class DraliaCalendarBuilder
     private readonly TimeSpan _slotDurationInMinutes;
     
     /// <summary>
-    /// //Dummy constant for Sunday edge case (see usage below).
+    /// Dummy constant for Sunday edge case (see usage below) and primitive calculations.
     /// </summary>
     private const int NumberOfDaysInWeek = 7;
 
@@ -42,7 +47,7 @@ public class DraliaCalendarBuilder
 
     private DayInTimetable BuildDayInTimeTable(DayWithDayOfWeek dayWithDayOfWeek)
     {
-        var actualDate = GetNextDayOfWeek(_searchDate, dayWithDayOfWeek.DayOfWeek);
+        var actualDate = _searchDate.GetDateTimeBaseOnDayOfWeek(dayWithDayOfWeek.DayOfWeek);
 
         var currentStart = dayWithDayOfWeek.Day!.WorkPeriod.StarHourAsDate(actualDate);
         var endDate = dayWithDayOfWeek.Day!.WorkPeriod.EndHourAsDate(actualDate);
@@ -87,18 +92,12 @@ public class DraliaCalendarBuilder
 
     private bool SameAsSearchDayOrLaterInWeek(DayWithDayOfWeek dayWithDayOfWeek)
     {
-        //Found edge cases thanks tests
+        //Found edge cases thanks tests.
         //DayOfWeek enum started with Sunday, not Monday -> we need to check it separately.
         if (dayWithDayOfWeek.DayOfWeek is DayOfWeek.Sunday)
             return NumberOfDaysInWeek >= (int)_searchDate.DayOfWeek;
         
         return dayWithDayOfWeek.DayOfWeek >= _searchDate.DayOfWeek;
-    }
-
-    private static DateTime GetNextDayOfWeek(DateTime baseDate, DayOfWeek targetDayOfWeek)
-    {
-        var daysUntilTarget = ((int) targetDayOfWeek - (int) baseDate.DayOfWeek + 7) % 7;
-        return baseDate.AddDays(daysUntilTarget);
     }
 
     private bool SameAsSearchDayInWeek(DayWithDayOfWeek dayWithDayOfWeek)

@@ -23,7 +23,7 @@ public class DraliaWrapper : IDisposable
 
     public Task<Result<FacilityWeekResponse, Problem>> GetAvailableSlotsPerWeek(DateTime searchDate)
         => _client.Request(AvailabilitySegment, GetWeeklySegment)
-            .AppendPathSegment($"{DraliaHelper.GetMondayDateOfCurrentWeek(searchDate):yyyyMMdd}")
+            .AppendPathSegment($"{searchDate.GetMondayDateOfCurrentWeek():yyyyMMdd}")
             .GetAsync()
             .To(ConvertResponseTo<FacilityWeekResponse>);
 

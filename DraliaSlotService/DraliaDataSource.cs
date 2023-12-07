@@ -39,7 +39,7 @@ public class DraliaTimetableDataSource : ITimetableDataSource
 
         return slotsAsResult.IsSuccess
             ? BuildSingleDayInTimetable(slotsAsResult.Data, searchDate)
-            : Result<DayInTimetable, Problem>.Failure(new Problem(slotsAsResult.Problem.Message, ProblemType.ExternalServiceError));
+            : slotsAsResult.Problem;
     }
     
     private static Timetable BuildDoctorCalendar(FacilityWeekResponse facilityWeek, DateTime mondayDate)
