@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using DraliaSlotService.SDK;
+﻿using DraliaSlotService.SDK;
 using FluentAssertions;
 using SlotServiceProxy.Domain.Shared;
 using SlotServiceProxy.Shared;
@@ -37,8 +36,12 @@ public class DraliaCalendarBuilderTests
         
         var day = dayAsResult.Data;
         day.Slots.Count.Should().Be(DefaultCountOfFreeSlots, "No busy slots except lunch -> default count of free slots");
-        day.Slots.Should().AllSatisfy(slot => SlotHasValidDuration(slot, facilityWeek), 
-            "All slot durations must be equal to facility slot duration");
+        
+        foreach (var dailyTimeRange in day.Slots)
+        {
+            dailyTimeRange.Duration.To(s => s.Minutes).Should().Be(facilityWeek.SlotDurationMinutes, 
+                "All slots must have same duration as facility slot duration!");
+        }
     }
 
     [Fact]
@@ -62,7 +65,7 @@ public class DraliaCalendarBuilderTests
         var dayAsResult = builder.BuildSingleDay();
         
         //Assert
-        dayAsResult.IsSuccess.Should().BeTrue("No problems expected for simple case.");
+        dayAsResult.IsSuccess.Should().BeTrue();
 
         var day = dayAsResult.Data;
         day.Slots.Count.Should().Be(0, "All day is busy -> no free slots expected.");
@@ -117,6 +120,8 @@ public class DraliaCalendarBuilderTests
 
         var day = dayAsResult.Data;
         day.Slots.Should().HaveCount(expectedFreeSlots.Count, "Calculated slots count must be equal to expected count.");
+        
+        //This check unite all needed check (same count, same slots).
         day.Slots.Except(expectedFreeSlots).Count().Should().Be(0, "Calculated slots must be equal to expected slots.");
     }
 
@@ -156,39 +161,45 @@ public class DraliaCalendarBuilderTests
         var dayAsResult = builder.BuildSingleDay();
 
         //Assert
-        dayAsResult.IsSuccess.Should().BeTrue("No problems expected.");
+        dayAsResult.IsSuccess.Should().BeTrue();
         var day = dayAsResult.Data;
         
         day.Slots.Except(expectedFreeSlots).Count().Should().Be(0, "Calculated slots must be equal to expected slots.");
     }
     
-    //TODO: Must be finished, important case.
-    [Theory(Skip = "Not implemented yet.")]
-    [InlineData]
+    [Fact]
     public void BuildSingleDay_SlotDurationIsNotDivisibleBy60_DayWithFreeSlotsBuiltCorrect()
     {
         //Arrange
-        var notEqualBusySlots = new List<DailyTimeRange>
+        
+        //Big (relatively to one hour) random prime number. > 30 to have less free slots and easier 
+        //expected slots structure.
+        var primeBigSlotDuration = 47;
+        var notEqualBusySlots = new DailyTimeRange[]
         {
             //1hour
-            new(DefaultMondayDateTime.Date.AddHours(8), DefaultMondayDateTime.Date.AddHours(9)),
+            new(DefaultWithHourAndMin(8), DefaultWithHourAndMin(9)),
             //10min
-            new(DefaultMondayDateTime.Date.AddHours(9).AddMinutes(30), DefaultMondayDateTime.Date.AddHours(9).AddMinutes(40)),
-            //Slot duration
-            new(DefaultMondayDateTime.Date.AddHours(10), DefaultMondayDateTime.Date.AddHours(10).AddMinutes(30)),
+            new(DefaultWithHourAndMin(9, 30), DefaultWithHourAndMin(9, 40)),
             //23 - random prime number duration
-            new(DefaultMondayDateTime.Date.AddHours(11), DefaultMondayDateTime.Date.AddHours(11).AddMinutes(23)),
+            new(DefaultWithHourAndMin(11), DefaultWithHourAndMin(11, 23)),
             //1min
-            new(DefaultMondayDateTime.Date.AddHours(13), DefaultMondayDateTime.Date.AddHours(13).AddMinutes(1)),
+            new(DefaultWithHourAndMin(13), DefaultWithHourAndMin(13, 1)),
         };
-        var mondayWithNotEqualBusySlots = new FacilityDay(DefaultWorkPeriod, notEqualBusySlots);
+        var expectedFreeSlots = new DailyTimeRange[]
+        {
+            new(DefaultWithHourAndMin(9, 40), DefaultWithHourAndMin(10, 27)),
+            new(DefaultWithHourAndMin(13, 1), DefaultWithHourAndMin(13, 48)),
+        };
         
-        //Random prime number.
+        var mondayWithNotEqualBusySlots = new FacilityDay(DefaultWorkPeriod, notEqualBusySlots);
         var facilityWeek = FacilityWeekBuilder.EmptyWeek.WithMonday(mondayWithNotEqualBusySlots)
             with
             {
-                SlotDurationMinutes = 13
+                SlotDurationMinutes = primeBigSlotDuration,
             };
+        
+        //Random prime number.
         var builder = new DraliaCalendarBuilder(facilityWeek, DefaultMondayDateTime);
         
         
@@ -196,9 +207,10 @@ public class DraliaCalendarBuilderTests
         var dayAsResult = builder.BuildSingleDay();
 
         //Assert
-        dayAsResult.IsSuccess.Should().BeTrue("No problems expected.");
+        dayAsResult.IsSuccess.Should().BeTrue();
         var day = dayAsResult.Data;
         
+        day.Slots.Except(expectedFreeSlots).Count().Should().Be(0, "Calculated slots must be equal to expected slots.");
     }
     
     [Theory]
@@ -222,14 +234,12 @@ public class DraliaCalendarBuilderTests
         var expectedNumberOfDays = 8 - (int) searchDate.DayOfWeek;
         calendar.Days.Count.Should().Be(expectedNumberOfDays, "For search date we expect only days from this date to end of the week!" +
                                                               $"Day week with problem: {searchDate.DayOfWeek}");
-        foreach (var day in calendar.Days)
+        foreach (var dailyTimeRange in calendar.Days.SelectMany(day => day.Slots))
         {
-            //Check dates of day as well!
-            day.Slots.Should().AllSatisfy(slot => SlotHasValidDuration(slot, facilityWeek),
-                "All days must have default count of free slots, since no busy slots in facility week.");
+            dailyTimeRange.Duration.To(s => s.Minutes).Should().Be(facilityWeek.SlotDurationMinutes, 
+                "All slots must have same duration as facility slot duration!");
         }
     }
-    
     
     /// <summary>
     /// This test scenario can looks silly a bit,
@@ -260,28 +270,22 @@ public class DraliaCalendarBuilderTests
         //we should calculate expected number of days in week from 8.
         calendar.Days.Count.Should().Be(expectedDayCount, "One day is must absent only, since it not present in facility calendar." +
                                                           $"Day week with problem: {absentDay.DayOfWeek}");
-        foreach (var day in calendar.Days)
+        foreach (var dailyTimeRange in calendar.Days.SelectMany(day => day.Slots))
         {
-            //Check dates of day as well!
-            day.Slots.Should().AllSatisfy(slot => SlotHasValidDuration(slot, facilityWeek),
-                "All days must have default count of free slots, since no busy slots in facility week.");
+            dailyTimeRange.Duration.To(s => s.Minutes).Should().Be(facilityWeek.SlotDurationMinutes, 
+                "All slots must have same duration as facility slot duration!");
         }
     }
     
-
-    /// <summary>
-    /// Useful to simplify building slots for single day tests (they always are use DefaultMondayDateTime.Date)
-    /// </summary>
-    private static DateTime DefaultWithHourAndMin(int hours, int min = 0)
-        => DefaultMondayDateTime.Date.AddHours(hours).AddMinutes(min);
-    
-    private bool SlotHasValidDuration(DailyTimeRange slot, FacilityWeekResponse facilityWeek) 
-        => slot.Duration.To(s => s.Minutes) == facilityWeek.SlotDurationMinutes;
-
     public static IEnumerable<object[]> IterateDefaultWeekFromMonday()
     {
         for (var i = 0; i < 6; i++)
             yield return new object[] {DefaultMondayDateTime.AddDays(i)};
     }
     
+    /// <summary>
+    /// Useful to simplify building slots for single day tests (they always are use DefaultMondayDateTime.Date)
+    /// </summary>
+    private static DateTime DefaultWithHourAndMin(int hours, int min = 0)
+        => DefaultMondayDateTime.Date.AddHours(hours).AddMinutes(min);
 }
