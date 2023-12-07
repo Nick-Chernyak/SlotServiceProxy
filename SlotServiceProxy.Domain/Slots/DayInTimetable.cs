@@ -1,5 +1,4 @@
 ﻿using SlotServiceProxy.Domain.Shared;
-using SlotServiceProxy.Domain.Shared.ValueObjects;
 
 namespace SlotServiceProxy.Domain.Slots;
 
@@ -8,6 +7,9 @@ namespace SlotServiceProxy.Domain.Slots;
 /// </summary>
 public record DayInTimetable : IComparable<DayInTimetable>
 {
+    private const int HighestHourInDay = 23;
+    private const int LowestHourInDay = 0;
+    
     private readonly HashSet<DailyTimeRange> _slots;
     
     /// <summary>
@@ -23,11 +25,14 @@ public record DayInTimetable : IComparable<DayInTimetable>
     
     public DayInTimetable(DateTime date, TimeSpan start, TimeSpan end)
     {
-        if (start > end)
+        if (start > end || start == end)
             throw new ArgumentException("Start time must be less than end time");
-        
+
         if (end - start > TimeSpan.FromDays(1))
             throw new ArgumentException("Day duration must be less than 24 hours");
+
+        if (!IsHoursInDayBorders(start) || !IsHoursInDayBorders(end))
+            throw new ArgumentException("Start / end time must be in day borders (0h-23h)");
         
         Date = date.Date;
         Start = start;
@@ -63,4 +68,7 @@ public record DayInTimetable : IComparable<DayInTimetable>
         
         _slots.Add(dailyTimeRange);
     }
+
+    private static bool IsHoursInDayBorders(TimeSpan timeSpan)
+        => timeSpan.TotalHours is <= HighestHourInDay and >= LowestHourInDay;
 }
