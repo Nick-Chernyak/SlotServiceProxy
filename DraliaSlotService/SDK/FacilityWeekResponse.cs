@@ -1,5 +1,4 @@
 ﻿using SlotServiceProxy.Domain.Shared;
-using SlotServiceProxy.Domain.Shared.ValueObjects;
 
 namespace DraliaSlotService.SDK;
 

@@ -1,5 +1,4 @@
 ﻿using DryIoc;
-using SlotServiceProxy.Domain;
 using SlotServiceProxy.Domain.Slots;
 
 namespace DraliaSlotService;

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using DraliaSlotService.SDK;
 using SlotServiceProxy.Domain.Shared;
-using SlotServiceProxy.Domain.Shared.ValueObjects;
 using SlotServiceProxy.Domain.Slots;
 using SlotServiceProxy.Shared;
 

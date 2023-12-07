@@ -1,4 +1,4 @@
-﻿namespace DraliaSlotService.SDK;
+﻿namespace DraliaSlotService;
 
 public static class DraliaHelper
 {

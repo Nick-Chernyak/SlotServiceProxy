@@ -33,7 +33,7 @@ public class DraliaWrapper : IDisposable
             .PostJsonAsync(reserveSlotRequest)
             .To(ConvertResponseTo);
 
-    private static async Task<Result<T, Problem>> ConvertResponseTo<T>(Task<IFlurlResponse> response)
+    private static async Task<Result<T, Problem>> ConvertResponseTo<T>(Task<IFlurlResponse> response) where T : IDraliaResponse
     {
         try
         {
