@@ -11,14 +11,18 @@ namespace SlotServiceProxy.Application.Slots.ReserveSlot;
 public class ReserveSlotCommandHandler : BaseRulesCheckerHandler, IRequestHandler<ReserveSlotCommand, Result<ReservedSlotDto, Problem>>
 {
     private readonly ITimetableDataSource _timetableDataSource;
+    private readonly IDateTimeService _dateTimeService;
 
-    public ReserveSlotCommandHandler(ITimetableDataSource timetableDataSource)
-        => _timetableDataSource = timetableDataSource;
+    public ReserveSlotCommandHandler(ITimetableDataSource timetableDataSource, IDateTimeService dateTimeService)
+    {
+         _timetableDataSource = timetableDataSource;
+         _dateTimeService = dateTimeService;
+    }
 
     public async Task<Result<ReservedSlotDto, Problem>> Handle(ReserveSlotCommand reserveSlotCommand,
         CancellationToken cancellationToken)
     {
-        var slotForReservation = CheckRulesAndGetSlotOrThrow(reserveSlotCommand);
+        var slotForReservation = CheckRulesAndGetSlotOrThrow(reserveSlotCommand, _dateTimeService);
         
         var dayAsResult = await _timetableDataSource.GetDayInTimetableAsync(slotForReservation.Start.Date);
 
@@ -94,14 +98,14 @@ public class ReserveSlotCommandHandler : BaseRulesCheckerHandler, IRequestHandle
    
     #region Validate business rules
 
-    private static DailyTimeRange CheckRulesAndGetSlotOrThrow(ReserveSlotCommand reserveSlotCommand)
+    private DailyTimeRange CheckRulesAndGetSlotOrThrow(ReserveSlotCommand reserveSlotCommand, IDateTimeService dateTimeService)
     {
         var slot = new SlotForReservationMustBeValidDailyTimeRange(
                 reserveSlotCommand.Slot.Start,
                 reserveSlotCommand.Slot.End)
             .To(CheckRuleAndGetValue);
 
-        new SlotForReservationCanNotBeInPast(slot).Do(CheckRule);
+        new SlotForReservationCanNotBeInPast(slot, dateTimeService).Do(CheckRule);
 
         return slot;
     }

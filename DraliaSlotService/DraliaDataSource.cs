@@ -14,7 +14,7 @@ public class DraliaTimetableDataSource : ITimetableDataSource
     public DraliaTimetableDataSource(IFlurlClientFactory flurlClientFactory)
         => _draliaWrapper = new DraliaWrapper(flurlClientFactory);
 
-    public async Task<Result<OwnedTimetable, Problem>> GetDoctorWithWeekCalendarAsync(DateTime from)
+    public async Task<Result<OwnedTimetable, Problem>> GetWeekTimetableCalendarAsync(DateTime from)
     {
         var slotsAsResult = await _draliaWrapper.GetAvailableSlotsPerWeek(from);
         

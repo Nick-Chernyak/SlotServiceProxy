@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SlotServiceProxy.Domain\SlotServiceProxy.Domain.csproj" />
+      <ProjectReference Include="..\SlotServiceProxy.Application\SlotServiceProxy.Application.csproj" />
     </ItemGroup>
 
 </Project>

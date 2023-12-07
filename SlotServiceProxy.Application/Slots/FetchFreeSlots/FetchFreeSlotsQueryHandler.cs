@@ -1,9 +1,7 @@
 ﻿using MediatR;
 using SlotServiceProxy.Application.Slots.SDK;
-using SlotServiceProxy.Domain;
 using SlotServiceProxy.Domain.Rules.FetchFreeSlots;
 using SlotServiceProxy.Domain.Shared;
-using SlotServiceProxy.Domain.Shared.ValueObjects;
 using SlotServiceProxy.Domain.Slots;
 using SlotServiceProxy.Shared;
 
@@ -12,28 +10,32 @@ namespace SlotServiceProxy.Application.Slots.FetchFreeSlots;
 public class FetchFreeSlotsQueryHandler : BaseRulesCheckerHandler, IRequestHandler<FetchFreeSlotsQuery, Result<CalendarDto, Problem>>
 {
     private readonly ITimetableDataSource _timetableDataSource;
+    private readonly IDateTimeService _dateTimeService;
 
-    public FetchFreeSlotsQueryHandler(ITimetableDataSource timetableDataSource)
-        => _timetableDataSource = timetableDataSource;
+    public FetchFreeSlotsQueryHandler(ITimetableDataSource timetableDataSource, IDateTimeService dateTimeService)
+    {
+        _timetableDataSource = timetableDataSource;
+        _dateTimeService = dateTimeService;
+    }
 
     public async Task<Result<CalendarDto, Problem>> Handle(FetchFreeSlotsQuery request, CancellationToken cancellationToken)
     {
-        CheckRule(new SearchDateMustBeTodayOrInFuture(request.SearchDate));
+        CheckRule(new SearchDateMustBeTodayOrInFuture(request.SearchDate, _dateTimeService));
 
-        var calendarAsResult = await _timetableDataSource.GetDoctorWithWeekCalendarAsync(request.SearchDate);
+        var calendarAsResult = await _timetableDataSource.GetWeekTimetableCalendarAsync(request.SearchDate);
         return calendarAsResult.BiMap(
                 doctorCalendar =>
                 {
                     doctorCalendar.Timetable.Do(CutOffNotAvailableTodaySlotsIfNeeded);
                     return ToDoctorWithCalendarDto(doctorCalendar, request.SearchDate);
                 },
-                error => new Problem(error.Message));
+                error => error);
     }
 
-    private static void CutOffNotAvailableTodaySlotsIfNeeded(Timetable timetable)
+    private void CutOffNotAvailableTodaySlotsIfNeeded(Timetable timetable)
     {
-        var now = DateTime.Now;
-        var today = timetable.Days.SingleOrDefault(d => d.Date == now);
+        var now = _dateTimeService.Now();
+        var today = timetable.Days.SingleOrDefault(d => d.Date == now.Date);
         today?.CutOffSlotsBefore(now);
     }
 

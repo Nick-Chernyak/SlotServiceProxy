@@ -5,7 +5,7 @@ namespace SlotServiceProxy.Domain.Slots;
 /// <summary>
 /// Represent a timetable with days that have can have slots for reservation.
 /// </summary>
-public class Timetable
+public record Timetable
 {
     //Mostly all needed domain logic covered by using ImmutableSortedSet as a collection for Days:
     //1. Days cannot be changed (at least by ImmutableSortedSet contract);

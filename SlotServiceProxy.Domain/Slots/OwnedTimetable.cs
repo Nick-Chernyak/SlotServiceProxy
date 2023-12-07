@@ -6,7 +6,7 @@ namespace SlotServiceProxy.Domain.Slots;
 /// Diff from <see cref="Timetable"/> that it has OwnerId -> means timetable owned by org/clinic/facility.
 /// Represent "owned by someone" timetable.
 /// </summary>
-public class OwnedTimetable
+public record OwnedTimetable
 {
     /// <summary>
     /// Id of timetable owner. Can be legal entity, physical, clinic, doctor and etc.

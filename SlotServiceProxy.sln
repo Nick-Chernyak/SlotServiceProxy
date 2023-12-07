@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlotServiceProxy.Domain.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlotServiceProxy.Web.Tests", "SlotServiceProxy.Web.Tests\SlotServiceProxy.Web.Tests.csproj", "{106E9754-94AC-4B46-AD68-DEDDB33FF816}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlotsServiceProxy.Application.Tests", "SlotsServiceProxy.Application.Tests\SlotsServiceProxy.Application.Tests.csproj", "{3B30ABAD-4652-4675-BBAF-31F081A36C7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,11 +66,16 @@ Global
 		{106E9754-94AC-4B46-AD68-DEDDB33FF816}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{106E9754-94AC-4B46-AD68-DEDDB33FF816}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{106E9754-94AC-4B46-AD68-DEDDB33FF816}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B30ABAD-4652-4675-BBAF-31F081A36C7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B30ABAD-4652-4675-BBAF-31F081A36C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B30ABAD-4652-4675-BBAF-31F081A36C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B30ABAD-4652-4675-BBAF-31F081A36C7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B43E9953-81A9-4802-B24D-019FF0CEF947} = {ED30BEE5-2BCE-482B-837C-DEB6B76C4C42}
 		{5A884ACF-5580-4AE0-B3AA-AB029116AAD0} = {6628B63B-1145-4F72-94D0-32257B7185B5}
 		{73AC432C-E3BD-40FA-9BF7-EF8071BFB209} = {6628B63B-1145-4F72-94D0-32257B7185B5}
 		{106E9754-94AC-4B46-AD68-DEDDB33FF816} = {6628B63B-1145-4F72-94D0-32257B7185B5}
+		{3B30ABAD-4652-4675-BBAF-31F081A36C7B} = {6628B63B-1145-4F72-94D0-32257B7185B5}
 	EndGlobalSection
 EndGlobal

@@ -51,7 +51,7 @@ public record DayInTimetable : IComparable<DayInTimetable>
         if (dateTime.Date != Date)
             throw new ArgumentException("Cut off date must be the same as the day date");
 
-        _slots.RemoveWhere(s => s.End < dateTime);
+        _slots.RemoveWhere(s => s.End <= dateTime);
     }
 
     public int CompareTo(DayInTimetable? obj) 

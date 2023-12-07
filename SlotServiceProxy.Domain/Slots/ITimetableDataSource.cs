@@ -9,7 +9,7 @@ namespace SlotServiceProxy.Domain.Slots;
 /// </summary>
 public interface ITimetableDataSource
 {
-    Task<Result<OwnedTimetable, Problem>> GetDoctorWithWeekCalendarAsync(DateTime from);
+    Task<Result<OwnedTimetable, Problem>> GetWeekTimetableCalendarAsync(DateTime from);
 
     Task<Result<DayInTimetable, Problem>> GetDayInTimetableAsync(DateTime searchDate);
     
