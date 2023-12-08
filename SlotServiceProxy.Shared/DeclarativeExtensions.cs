@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Very simple extensions for providing some declarative syntax and techniques in C#.
-/// Mostly inspired by F# and Elixir :).
+/// Mostly inspired by F# and Elixir + ImTools library.
 /// </summary>
 public static class DeclarativeExtensions
 {

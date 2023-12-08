@@ -1,13 +1,13 @@
-﻿using DryIoc;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SlotServiceProxy.Domain.Slots;
 
 namespace DraliaSlotService;
 
 public static class DraliaCompositionRoot
 {
-    public static IRegistrator DraliaSource(this IRegistrator registrator)
+    public static IServiceCollection DraliaSource(this IServiceCollection serviceCollection)
     {
-        registrator.Register<ITimetableDataSource, DraliaTimetableDataSource>();
-        return registrator;
+        serviceCollection.AddScoped<ITimetableDataSource, DraliaTimetableDataSource>();
+        return serviceCollection;
     }
 }

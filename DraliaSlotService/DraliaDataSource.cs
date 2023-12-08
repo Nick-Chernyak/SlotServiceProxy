@@ -7,7 +7,7 @@ using SlotServiceProxy.Shared;
 
 namespace DraliaSlotService;
 
-public class DraliaTimetableDataSource : ITimetableDataSource
+public class DraliaTimetableDataSource : ITimetableDataSource, IDisposable
 {
     private readonly DraliaWrapper _draliaWrapper;
 
@@ -50,4 +50,12 @@ public class DraliaTimetableDataSource : ITimetableDataSource
 
     private static OwnedTimetable BuildDoctorWithCalendar(FacilityWeekResponse facilityWeek, DateTime from) =>
         new(new NotEmptyString(facilityWeek.Facility.FacilityId), BuildDoctorCalendar(facilityWeek, from));
+
+    public void Dispose()
+    {
+        //Since Dralia wrapper builds FlurlClient in constructor, it should be disposed here
+        // + DraliaWrapper is not registered in DI container, so it's not disposed automatically
+        // But DraliaTimetableDataSource is registered in DI container, so it's disposed automatically
+        _draliaWrapper.Dispose();
+    }
 }

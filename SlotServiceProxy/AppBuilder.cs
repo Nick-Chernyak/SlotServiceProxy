@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using DryIoc.Microsoft.DependencyInjection;
 using MediatR;
 using Microsoft.OpenApi.Models;
 using SlotServiceProxy.Domain;
@@ -14,9 +13,7 @@ public static class AppBuilder
 {
     public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
     {
-        
-        var container = SlotsServiceProxyCompositionRoot.Build();
-        builder.Host.UseServiceProviderFactory(new DryIocServiceProviderFactory(container));
+        SlotsServiceProxyCompositionRoot.Build(builder.Services);
         
         builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.RegisterMediatR();

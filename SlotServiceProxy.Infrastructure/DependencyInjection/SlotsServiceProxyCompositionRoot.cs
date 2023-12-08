@@ -1,26 +1,19 @@
 ﻿using DraliaSlotService;
-using DryIoc;
-using DryIoc.Microsoft.DependencyInjection;
 using Flurl.Http.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using SlotServiceProxy.Domain.Shared;
 using SlotServiceProxy.Infrastructure.Shared;
-using SlotServiceProxy.Shared;
 
 namespace SlotServiceProxy.Infrastructure.DependencyInjection;
 
 public static class SlotsServiceProxyCompositionRoot
 {
-    private static IContainer CreateDefaultContainer() =>
-        new Container(cfg => cfg.WithDefaultReuse(Reuse.Scoped))
-            .WithDependencyInjectionAdapter();
-
-    public static IContainer Build()
+    public static IServiceCollection Build(IServiceCollection serviceCollection)
     {
-        var container = CreateDefaultContainer();
-        
-        container.Register<IFlurlClientFactory, DefaultFlurlClientFactory>(Reuse.Singleton);
-        container.Register<IDateTimeService, DateTimeService>();
-        
-        return container.DraliaSource().To<IContainer>();
+        //https://flurl.dev/docs/client-lifetime/#using-flurl-with-an-ioc-container
+        // -> singleton is preferred for the FlurlClientFactory registration.
+        serviceCollection.AddSingleton<IFlurlClientFactory, DefaultFlurlClientFactory>();
+        serviceCollection.AddScoped<IDateTimeService, DateTimeService>();
+        return serviceCollection.DraliaSource();
     }
 }
