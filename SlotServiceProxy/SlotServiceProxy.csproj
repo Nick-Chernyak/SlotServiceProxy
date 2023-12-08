@@ -21,12 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\SlotServiceProxy.Application\SlotServiceProxy.Application.csproj" />
       <ProjectReference Include="..\SlotServiceProxy.Infrastructure\SlotServiceProxy.Infrastructure.csproj" />
       <ProjectReference Include="..\SlotServiceProxy.Shared\SlotServiceProxy.Shared.csproj" />

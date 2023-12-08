@@ -27,7 +27,7 @@ public class SlotsController : SlotsProxyBaseController
     /// <para>If day is unavailable for reserving at all (and never was), it will not appear in response.</para>
     /// <para>If day <b>was</b> available for reserving, but no free slots available now - day without free slots will be returned. </para>
     /// </remarks>
-    /// <param name="searchDate">Base date for search in scope of current week.</param>
+    /// <param name="searchDate">Base date for search in scope of current week. Format: yyyy-MM-dd</param>
     [HttpGet("Availability/CurrentWeek/{searchDate:datetime}")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(CalendarDto), 200)]
