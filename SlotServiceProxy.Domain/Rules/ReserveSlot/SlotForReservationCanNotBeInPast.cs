@@ -16,7 +16,7 @@ public class SlotForReservationCanNotBeInPast : IBusinessRule
     }
 
     public bool IsBroken()
-        => _dailyTimeRange.Start.Date < _dateTimeService.Now();
+        => _dailyTimeRange.Start.Date < _dateTimeService.Now().Date;
     
     public string Message => "It is not possible to book slot in the past.";
 }
