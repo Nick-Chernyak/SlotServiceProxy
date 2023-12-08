@@ -1,15 +1,14 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using SlotServiceProxy.Domain;
 using SlotServiceProxy.Domain.Rules;
-using SlotServiceProxy.Domain.Shared.ValueObjects;
 using SlotServiceProxy.Shared;
 
 namespace SlotServiceProxy.Middlewares;
 
 /// <summary>
 /// Global Web exception handler.
-/// Handle exception from Application layer and map it to <see cref="ProblemDetails">ProblemDetails</see> with corresponding status code.
+/// Handle exception from Application layer and map it to <see cref="ProblemDetails">ProblemDetails</see>
+/// with corresponding status code.
 /// </summary>
 public class ErrorHandlingMiddleware
 {
@@ -41,6 +40,8 @@ public class ErrorHandlingMiddleware
                 .Do(p => p.Status = StatusCodes.Status422UnprocessableEntity),
             _ => DefaultProblemDetails
         };
+
+        problemDetails.Do(p => p.Instance = httpContext.Request.Path);
         
         await WriteResponseAsync(httpContext, problemDetails);
     }

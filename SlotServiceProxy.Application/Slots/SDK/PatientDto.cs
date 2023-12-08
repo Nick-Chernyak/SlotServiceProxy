@@ -29,7 +29,6 @@ public record PatientDto
     /// <summary>
     /// Patient email address.
     /// Required.
-    /// Regex format: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
     /// </summary>
     [Required]
     [RegularExpression(Domain.Shared.ValueObjects.Email.EmailPattern)]
@@ -38,7 +37,7 @@ public record PatientDto
     /// <summary>
     /// Patient phone number.
     /// Required.
-    /// Regex format: ^\+[1-9]\d{1,14}$ (E.164 standard).
+    /// Format: E.164 standard.
     /// </summary>
     [Required]
     [RegularExpression(Domain.Shared.ValueObjects.PhoneNumber.PhoneRegex)]
